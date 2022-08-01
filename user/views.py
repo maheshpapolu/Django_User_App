@@ -54,4 +54,3 @@ def user_login(request):
     except Exception as e:
         print(e)
         return JsonResponse({'message': 'error in your program'})
-
