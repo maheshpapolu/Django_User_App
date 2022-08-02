@@ -1,10 +1,10 @@
 from django.contrib.auth import authenticate
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.http import JsonResponse
-# from django.shortcuts import render
 from user.models import UserDetails
 import json
+import logging
+
+logging.basicConfig(filename='test.log', level=logging.ERROR)
 
 
 # Create your views here.
@@ -18,7 +18,8 @@ def index(request):
         print(request.method)
         return JsonResponse({"message": "you are at user index."})
     except Exception as e:
-        print(e)
+        logging.error("raised the error in code", exc_info=True)
+        return JsonResponse({'message': 'error in our code'})
 
 
 def registration(request):
@@ -29,15 +30,14 @@ def registration(request):
     """
     try:
         input_data = json.loads(request.body)
+        print(input_data)
         data = UserDetails.objects.create_user(username=input_data.get("username"), password=input_data.get("password"),
-                                               email=input_data.get("email"),
-                                               phone_number=input_data.get("phone_number"),
-                                               location=input_data.get("location"))
-        print(data)
+                                               email=input_data.get("email"), phone_number=input_data.get('phone_number'),
+                                               location=input_data.get('location'))
         return JsonResponse({"message": "running fine"})
-    except IntegrityError:
-        exception = {'Exception': 'Already Exits...!'}
-        return JsonResponse(exception)
+    except Exception as e:
+        logging.error(e)
+        return JsonResponse({'message': 'error in our code'})
 
 
 def user_login(request):
@@ -51,11 +51,12 @@ def user_login(request):
             username = input_data.get('username')
             password = input_data.get('password')
             login_user = authenticate(username=username, password=password)
-            if not login_user:
-                data = {'message': 'please check your username and password'}
+            print(login_user)
+            if login_user is not None:
+                data = {'message': 'logged successfully'}
                 return JsonResponse(data)
-            return JsonResponse({'message': 'logged successfully'})
+            return JsonResponse({'message': 'check the username and password'})
         return JsonResponse({'message': 'please check your request method'})
-    except ValidationError:
-        exception = {'Exception': " 'value doesn't Exits...!'"}
-        return JsonResponse(exception)
+    except Exception as e:
+        logging.error(e)
+        return JsonResponse({'message': 'error in our code'})
