@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'user',
 ]
 
@@ -77,7 +78,7 @@ WSGI_APPLICATION = 'python_notes.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'fundoo_projects',
         'USER': 'postgres',
         'PASSWORD': 'Satya_7799',
         'HOST': '127.0.0.1',
@@ -126,3 +127,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL = 'user.UserDetails'
