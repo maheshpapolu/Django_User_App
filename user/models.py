@@ -12,3 +12,4 @@ class UserDetails(AbstractUser):
     # email = models.CharField(max_length=20)
     phone_number = models.IntegerField()
     location = models.CharField(max_length=20)
+    is_verified = models.BooleanField(default=False)

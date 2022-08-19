@@ -28,6 +28,7 @@ class Registration(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
+            print(e)
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
