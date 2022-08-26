@@ -4,6 +4,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import logging
+from user.utils import EncodeDecodeToken
+from user.models import UserDetails
+from note.utils import verify_token
 
 logging.basicConfig(filename="notes.log", filemode="w")
 
@@ -12,7 +15,7 @@ class Notes(APIView):
     """
     class based views for crud operation
     """
-
+    @verify_token
     def post(self, request):
         """
         this method is created for inserting the data
@@ -35,6 +38,7 @@ class Notes(APIView):
             logging.error(e)
             return Response({"message": "validation failed"}, status=status.HTTP_400_BAD_REQUEST)
 
+    @verify_token
     def get(self, request):
         """
         this method is created for retrieve data
@@ -42,23 +46,24 @@ class Notes(APIView):
         :return: Response
         """
         try:
-            print(request.query_params)
-            note = Note.objects.filter(user_id=request.query_params.get("user_id"))
+            print(request.data)
+            note = Note.objects.filter(user_id=request.data.get("user_id"))
             serializer = NotesSerializer(note, many=True)
             return Response(
                 {
                     "message": "Your Notes",
                     "data": serializer.data
                 },
-                status=status.HTTP_201_CREATED)
+                status=status.HTTP_200_OK)
         except Exception as e:
             logging.error(e)
             return Response(
                 {
-                    "message": "No notes found"
+                    "message": str(e)
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
+    @verify_token
     def put(self, request):
         """
         To update a previous note
@@ -78,6 +83,7 @@ class Notes(APIView):
             return Response({"message": "Note update Failed", "error": "{}".format(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
+    @verify_token
     def delete(self, request):
         """
         this method is created for delete the note
