@@ -7,6 +7,7 @@ import logging
 from user.utils import EncodeDecodeToken
 from user.models import UserDetails
 from note.utils import verify_token
+from .utils import NoteCREDOperations
 
 logging.basicConfig(filename="notes.log", filemode="w")
 
@@ -27,6 +28,7 @@ class Notes(APIView):
             serializer = NotesSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            NoteCREDOperations().add_note(user_id=request.data.get("user_id"), note=serializer.data)
             return Response(
                 {
                     "message": "Notes created successfully",
@@ -46,13 +48,13 @@ class Notes(APIView):
         :return: Response
         """
         try:
-            print(request.data)
-            note = Note.objects.filter(user_id=request.data.get("user_id"))
-            serializer = NotesSerializer(note, many=True)
+            # note = Note.objects.filter(user_id=request.data.get("user_id"))
+            # serializer = NotesSerializer(note, many=True)
+            note = NoteCREDOperations().get_note(user_id=request.data.get("user_id"))
             return Response(
                 {
                     "message": "Your Notes",
-                    "data": serializer.data
+                    "data": note.values()
                 },
                 status=status.HTTP_200_OK)
         except Exception as e:
@@ -75,6 +77,9 @@ class Notes(APIView):
             serializer = NotesSerializer(note, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+
+            NoteCREDOperations().update_note(updated_note=serializer.data, user_id=request.data.get("user_id"))
+
             return Response({"Message": "Note Updated", "Data": serializer.data},
                             status=status.HTTP_202_ACCEPTED)
         except Exception as e:
@@ -92,6 +97,7 @@ class Notes(APIView):
         """
         try:
             note = Note.objects.get(id=request.data.get("id"))
+            NoteCREDOperations().delete_note(request.data.get("user_id"), request.data.get("id"))
             note.delete()
             return Response(
                 {

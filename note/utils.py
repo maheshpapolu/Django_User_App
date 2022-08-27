@@ -1,22 +1,9 @@
-from django.db.backends.utils import logger
-from rest_framework.response import Response
 from user.utils import EncodeDecodeToken
+import json
+from .redis_service import RedisServer
+import logging
 
 
-#
-# def verify_token(function):
-#     def wrapper(self, request):
-#         # if 'HTTP_AUTHORIZATION' not in request.META:
-#         #     response = Response({'message': 'Token not provided in the header'})
-#         #     response.status_code = 400
-#         #     logger.info('Token not provided in the header')
-#         #     return response
-#         # token = request.META["HTTP_AUTHORIZATION"]
-#         # user_id = EncodeDecodeToken.decode_the_token(token)
-#         # request.data.update({'user_id': user_id.get('user_id')})
-#         return function(self, request)
-#
-#     return wrapper
 def verify_token(function):
     def wrapper(self, request, *args, **kwargs):
         token = request.headers.get('Token')
@@ -29,3 +16,53 @@ def verify_token(function):
         return function(self, request, *args, **kwargs)
 
     return wrapper
+
+
+class NoteCREDOperations:
+    def __init__(self):
+
+        self.cache_memory = RedisServer()
+
+    def add_note(self, note, user_id):
+        try:
+            notes = self.get_note(user_id)
+            note_id = note.get('id')
+            notes.update({note_id: note})
+            self.cache_memory.set(user_id, json.dumps(notes))
+        except Exception as e:
+            logging.error(e)
+
+    def get_note(self, user_id):
+        """
+        getting note-data from the memory
+        """
+        try:
+            cache_data = self.cache_memory.get(user_id)
+            return {} if not cache_data else json.loads(cache_data)
+        except Exception as e:
+            logging.exception(e)
+
+    def update_note(self, updated_note, user_id):
+        """
+        update the existing note in the memory
+        """
+        try:
+
+            note_id = updated_note.get("id")
+            note_dict = self.get_note(user_id)
+            note_dict.update({note_id: updated_note})
+            self.add_note(user_id=user_id, note=note_dict)
+        except Exception as er:
+            logging.exception(er)
+
+    def delete_note(self, user_id, note_id):
+        """
+        deleting the note from the memory
+        """
+        try:
+            note_dict = self.get_note(user_id)
+            if note_dict.get(note_id):
+                note_dict.pop(note_id)
+                self.add_note(user_id=user_id, note=note_dict)
+        except Exception as error:
+            logging.exception(error)
