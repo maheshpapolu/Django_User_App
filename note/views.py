@@ -8,6 +8,8 @@ from user.utils import EncodeDecodeToken
 from user.models import UserDetails
 from note.utils import verify_token
 from .utils import NoteCREDOperations
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 logging.basicConfig(filename="notes.log", filemode="w")
 
@@ -16,6 +18,16 @@ class Notes(APIView):
     """
     class based views for crud operation
     """
+    @swagger_auto_schema(
+        operation_summary="Add",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'title': openapi.Schema(type=openapi.TYPE_STRING, description="title"),
+                'description': openapi.Schema(type=openapi.TYPE_STRING, description="description"),
+            }
+        ),
+    )
     @verify_token
     def post(self, request):
         """
@@ -40,6 +52,9 @@ class Notes(APIView):
             logging.error(e)
             return Response({"message": "validation failed"}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_summary="get",
+    )
     @verify_token
     def get(self, request):
         """
@@ -59,12 +74,19 @@ class Notes(APIView):
                 status=status.HTTP_200_OK)
         except Exception as e:
             logging.error(e)
-            return Response(
-                {
-                    "message": str(e)
-                },
-                status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_summary="update ",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'title': openapi.Schema(type=openapi.TYPE_STRING, description="title"),
+                'description': openapi.Schema(type=openapi.TYPE_STRING, description="description"),
+                'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="note id"),
+            }
+        ),
+    )
     @verify_token
     def put(self, request):
         """
@@ -88,6 +110,15 @@ class Notes(APIView):
             return Response({"message": "Note update Failed", "error": "{}".format(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        operation_summary="Delete",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="note id"),
+            }
+        ),
+    )
     @verify_token
     def delete(self, request):
         """
