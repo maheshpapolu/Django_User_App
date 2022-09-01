@@ -3,6 +3,10 @@ from django.db.migrations import serializer
 from django.http import HttpResponse
 import json
 import logging
+
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
 from user.models import UserDetails
 from user.serializers import UserDetailsSerializer
 # from django.http import Http404
@@ -21,6 +25,17 @@ class Registration(APIView):
        List all user, or create a new user details.
     """
 
+    @swagger_auto_schema(
+        operation_summary="register",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='username'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='password'),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='email'),
+                'phone_number': openapi.Schema(type=openapi.TYPE_STRING, description='phone_number'),
+            }
+        ))
     def post(self, request):
         """
 
@@ -42,7 +57,15 @@ class Registration(APIView):
 
 
 class Login(APIView):
-
+    @swagger_auto_schema(
+        operation_summary="login",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='username'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='password'),
+            }
+        ))
     def post(self, request):
         """
         create the user_login for getting into app

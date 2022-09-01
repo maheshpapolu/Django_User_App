@@ -34,8 +34,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'user',
-    'note'
-]
+    'note',
+    'drf_yasg']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -137,4 +137,23 @@ REDIS_CONFIG = {
     "host": "localhost",
     "port": 6379,
     "db": 0
+}
+# Swagger Settings
+# SWAGGER_SETTINGS = {
+#     'SECURITY_DEFINITIONS': {
+#         "Auth Token eg [Bearer (JWT)]": {
+#             "type": "apiKey",
+#             "name": "Authorization",
+#             "in": "header"
+#         }
+#     }
+# }
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Token',
+            'in': 'header'
+        }
+    }
 }
