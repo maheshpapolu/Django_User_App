@@ -66,3 +66,5 @@ class NoteCREDOperations:
                 self.add_note(user_id=user_id, note=note_dict)
         except Exception as error:
             logging.exception(error)
+
+#

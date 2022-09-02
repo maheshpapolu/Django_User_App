@@ -1,0 +1,1 @@
+celery -A python_notes worker -l INFO --pool=solo

@@ -16,6 +16,7 @@ from rest_framework import status
 from .utils import EncodeDecodeToken
 from django.core.mail import send_mail
 from django.conf import settings
+from user.tasks import send_email
 
 logging.basicConfig(filename='test.log', level=logging.ERROR)
 
@@ -45,10 +46,8 @@ class Registration(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             encode_token = EncodeDecodeToken.encode_the_token(payload={'user_id': serializer.data.get('id')})
-            send_mail(from_email=settings.EMAIL_HOST_USER, recipient_list=[serializer.data['email']],
-                      message='welcome django_rest_framework, url is http://127.0.0.1:8000/user/validate/{}'.format(
-                          encode_token),
-                      subject='Link the registration', fail_silently=False, )
+            print(encode_token)
+            send_email.delay(token=encode_token, to=serializer.data['email'], name=serializer.data['username']),
             logging.debug('registration done')
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
