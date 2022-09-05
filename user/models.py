@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -15,3 +17,7 @@ class UserDetails(AbstractUser):
     is_verified = models.BooleanField(default=False)
 
 
+class LogTable(models.Model):
+    hit_time = models.DateTimeField(auto_now_add=True)
+    type_of_request = models.CharField(max_length=250)
+    response = models.CharField(max_length=200)

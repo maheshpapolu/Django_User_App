@@ -45,7 +45,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+    #     custom middleware
+    'python_notes.middleware.CustomMiddleware'
 ]
 
 ROOT_URLCONF = 'python_notes.urls'
